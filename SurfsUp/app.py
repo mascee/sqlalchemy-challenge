@@ -1,23 +1,35 @@
 # Import the dependencies.
+import numpy as np
 
+import sqlalchemy
+from sqlalchemy.ext.automap import automap_base
+from sqlalchemy.orm import Session
+from sqlalchemy import create_engine, func
 from flask import Flask, jsonify, render_template
 
 
 #################################################
 # Database Setup
 #################################################
+engine = create_engine("sqlite:///Resources/hawaii.sqlite")
+
+
+# reflect an existing database into a new model
+Base = automap_base()
+# reflect the tables
+Base.prepare(autoload_with=engine)
+Base.classes.keys()
+Measurement = Base.classes.measurement
+Station = Base.classes.station
+
+#################################################
+# Flask Setup
+#################################################
 app = Flask(__name__)
 
 #################################################
 # Flask Routes
 #################################################
-@app.route("/api/v1.0/precipitation")
-def precipitation():
-    results = session.query(Measurement.date, Measurement.prcp).all()
-    precipitation_data = {date: prcp for date, prcp in results}
-    return jsonify(precipitation_data)
-
-
 @app.route("/")
 def welcome():
     return (
@@ -33,6 +45,18 @@ def welcome():
 if __name__ == "__main__":
     app.run(debug=True)
 
+
+@app.route("/api/v1.0/precipitation")
+def precipitation():
+    results = session.query(Measurement.date, Measurement.prcp).all()
+    precipitation_data = {date: prcp for date, prcp in results}
+    return jsonify(precipitation_data)
+
+
+@app.route("/api/v1.0/stations")
+def stations():
+    results = 
+    
 
 
 # reflect an existing database into a new model
