@@ -33,26 +33,16 @@ session = Session(engine)
 
 #################################################
 # Flask Routes
-#################################################
-@app.route("/about")
-def welcome():
+@app.route("/")
+def home():
     return (
         f"Welcome to the Climate app API!<br/>"
         f"Available Routes:<br/>"
-        f"  "
-        f"/api/v1.0/precipitation"
-         f"  "
-        f"/api/v1.0/stations"
-         f"  "
-
-        f"/api/v1.0/tobs"
-        f"  "
-
-        f"/api/v1.0/<start>"
-        f"  "
-
-        f"/api/v1.0/<start>/<end>"
-
+        f"/api/v1.0/precipitation<br/>"
+        f"/api/v1.0/stations<br/>"
+        f"/api/v1.0/tobs<br/>"
+        f"/api/v1.0/<start><br/>"
+        f"/api/v1.0/<start>/<end><br/>"
     )
 
 
@@ -81,43 +71,36 @@ def stations_route():
 @app.route("/api/v1.0/tobs")
 def tobs_route():
     one_year_ago = dt.date(2017, 8, 23) - dt.timedelta(days=365)
-    most_active_stations = session.query(
-    Measurement.station, 
-    func.count(Measurement.station).label('count')).group_by(Measurement.station).order_by(func.count(Measurement.station).desc()).all()
-    most_active_station = most_active_stations[0][0]
+    
+    most_active_station = session.query(Measurement.station).\
+        group_by(Measurement.station).\
+        order_by(func.count(Measurement.station).desc()).first()[0]
+    
     temp_data = session.query(Measurement.date, Measurement.tobs).\
-    filter(Measurement.station == most_active_station).\
-    filter(Measurement.date >= one_year_ago)
-    temperatures = []
-    for temp in temp_data:
-        temperatures.append(temp[1])
-    #temp_observations = [{date: tobs} for date, tobs in temp_data]
-    return jsonify(temperatures)
+        filter(Measurement.station == most_active_station).\
+        filter(Measurement.date >= one_year_ago).all()
+    
+    temp_observations = [{date: tobs} for date, tobs in temp_data]
+    
+    return jsonify(temp_observations)
 
 
 
-#@app.route("/api/v1.0/<start>")
+
 #Return a JSON list of the minimum temperature, the average temperature, and the maximum temperature for a specified start or start-end range.
 #For a specified start, calculate TMIN, TAVG, and TMAX for all the dates greater than or equal to the start date.
 #For a specified start date and end date, calculate TMIN, TAVG, and TMAX for the dates from the start date to the end date, inclusive.
-#@app.route("/api/v1.0/<start>/<end")
-#def temperature_range(start=None, end=None):
-#    sel = [func.min(Measurement.tobs), func.avg(Measurement.tobs), func.max(Measurement.tobs)]
-#    if not end:
-#        results = session.query(*sel).filter(Measurement.date >= start).all()
-#    else:
-#        results = session.query(*sel).filter(Measurement.date >= start).filter(Measurement.date <=end).all()
+@app.route("/api/v1.0/<start>")
+@app.route("/api/v1.0/<start>/<end>")
+def temperature_range(start=None, end=None):
+    sel = [func.min(Measurement.tobs), func.avg(Measurement.tobs), func.max(Measurement.tobs)]
+    if not end:
+        results = session.query(*sel).filter(Measurement.date >= start).all()
+    else:
+        results = session.query(*sel).filter(Measurement.date >= start).filter(Measurement.date <=end).all()
 
-#    temp_data = list(np.ravel(results))
-#    return jsonify(temp_data)
+    temp_data = list(np.ravel(results))
+    return jsonify(temp_data)
 
-
-# reflect an existing database into a new model
-
-# reflect the tables
-
-# Save references to each table
-
-# Create our session (link) from Python to the DB
 if __name__ == "__main__":
     app.run(debug=True)
