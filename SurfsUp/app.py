@@ -89,18 +89,45 @@ def tobs_route():
 
 #Return a JSON list of the minimum temperature, the average temperature, and the maximum temperature for a specified start or start-end range.
 #For a specified start, calculate TMIN, TAVG, and TMAX for all the dates greater than or equal to the start date.
-#For a specified start date and end date, calculate TMIN, TAVG, and TMAX for the dates from the start date to the end date, inclusive.
-@app.route("/api/v1.0/<start>")
-@app.route("/api/v1.0/<start>/<end>")
-def temperature_range(start=None, end=None):
-    sel = [func.min(Measurement.tobs), func.avg(Measurement.tobs), func.max(Measurement.tobs)]
-    if not end:
-        results = session.query(*sel).filter(Measurement.date >= start).all()
-    else:
-        results = session.query(*sel).filter(Measurement.date >= start).filter(Measurement.date <=end).all()
 
+#@app.route("/api/v1.0/<start>")
+
+#def start_date_temp_route(start):
+#Functions for min, max, avg temperatures
+#sel = [func.min(Measurement.tobs), func.avg(Measurement.tobs),func.max(Measurement.tobs)]
+#Query the results filtering by the start date
+#results = session.query(*sel).filter(Measurement.date >=start).all()
+#Convert results to a list and return as JSON
+#temp_data = list(np.ravel(results))
+#return jsonify(temp_data)
+
+@app.route("/api/v1.0/<start>")
+def start_date_temp_route(start):
+    # Convert the string into a date object
+    start_date = dt.datetime.strptime(start, "%Y-%m-%d").date()
+
+    # Functions for min, max, avg temperatures
+    sel = [func.min(Measurement.tobs), func.avg(Measurement.tobs), func.max(Measurement.tobs)]
+
+    # Query the results filtering by the start date
+    results = session.query(*sel).filter(Measurement.date >= start_date).all()
+
+    # Convert results to a list and return as JSON
     temp_data = list(np.ravel(results))
     return jsonify(temp_data)
+
+#For a specified start date and end date, calculate TMIN, TAVG, and TMAX for the dates from the start date to the end date, inclusive.
+@app.route("/api/v1.0/<start>/<end>")
+def temp_stats_route(start, end):
+    sel = [func.min(Measurement.tobs), func.avg(Measurement.tobs), func.max(Measurement.tobs)]
+    results = session.query(*sel).filter(Measurement.date >= start).filter(Measurement.date <= end).all()
+    
+    # Convert the result into a list
+    temp_data = list(np.ravel(results))
+    
+    # Return the JSON list of the min, avg, and max temperature
+    return jsonify(temp_data)
+
 
 if __name__ == "__main__":
     app.run(debug=True)
