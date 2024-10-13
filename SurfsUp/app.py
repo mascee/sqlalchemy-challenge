@@ -35,14 +35,14 @@ session = Session(engine)
 # Flask Routes
 @app.route("/")
 def home():
-    return (
+      return (
         f"Welcome to the Climate app API!<br/>"
         f"Available Routes:<br/>"
         f"/api/v1.0/precipitation<br/>"
         f"/api/v1.0/stations<br/>"
         f"/api/v1.0/tobs<br/>"
-        f"/api/v1.0/<start><br/>"
-        f"/api/v1.0/<start>/<end><br/>"
+        f"/api/v1.0/start_date (e.g., /api/v1.0/2017-01-01)<br/>"
+        f"/api/v1.0/start_date/end_date (e.g., /api/v1.0/2017-01-01/2017-12-31)<br/>"
     )
 
 
