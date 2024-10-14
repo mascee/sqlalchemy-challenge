@@ -38,7 +38,7 @@ def home():
       return (
         f"Welcome to the Climate app API!<br/>"
         f"Available Routes:<br/>"
-        f"/api/v1.0/precipitation<br/>"
+        #f"/api/v1.0/precipitation<br/>"
         f"<a href='/api/v1.0/precipitation'>/api/v1.0/precipitation</a><br/>"
         f"/api/v1.0/stations<br/>"
         f"/api/v1.0/tobs<br/>"
@@ -124,6 +124,10 @@ def start_date_temp_route(start):
 #For a specified start date and end date, calculate TMIN, TAVG, and TMAX for the dates from the start date to the end date, inclusive.
 @app.route("/api/v1.0/<start>/<end>")
 def temp_stats_route(start, end):
+    # Convert the string into a date object
+    start_date = dt.datetime.strptime(start, "%Y-%m-%d").date()
+    # Convert the string into a date object
+    end_date = dt.datetime.strptime(end, "%Y-%m-%d").date()
     sel = [func.min(Measurement.tobs), func.avg(Measurement.tobs), func.max(Measurement.tobs)]
     results = session.query(*sel).filter(Measurement.date >= start).filter(Measurement.date <= end).all()
     
