@@ -39,6 +39,7 @@ def home():
         f"Welcome to the Climate app API!<br/>"
         f"Available Routes:<br/>"
         f"/api/v1.0/precipitation<br/>"
+        f"<a href='/api/v1.0/precipitation'>/api/v1.0/precipitation</a><br/>"
         f"/api/v1.0/stations<br/>"
         f"/api/v1.0/tobs<br/>"
         f"/api/v1.0/start_date (e.g., /api/v1.0/2017-01-01)<br/>"
@@ -106,11 +107,15 @@ def start_date_temp_route(start):
     # Convert the string into a date object
     start_date = dt.datetime.strptime(start, "%Y-%m-%d").date()
 
+    print(f"{start=} {start_date=}", flush=True)
+
     # Functions for min, max, avg temperatures
     sel = [func.min(Measurement.tobs), func.avg(Measurement.tobs), func.max(Measurement.tobs)]
 
     # Query the results filtering by the start date
     results = session.query(*sel).filter(Measurement.date >= start_date).all()
+
+    print(f"{results=}", flush=True)
 
     # Convert results to a list and return as JSON
     temp_data = list(np.ravel(results))
