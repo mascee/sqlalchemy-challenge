@@ -24,8 +24,6 @@ engine = create_engine("sqlite:///Resources/hawaii.sqlite")
 Base = automap_base()
 # reflect the tables
 Base.prepare(engine, reflect=True)
-#Base.prepare(autoload_with=engine)
-#Base.classes.keys()
 Measurement = Base.classes.measurement
 Station = Base.classes.station
 session = Session(engine)
@@ -38,21 +36,24 @@ def home():
       return (
         f"Welcome to the Climate app API!<br/>"
         f"Available Routes:<br/>"
+        #Precipitation
         #f"/api/v1.0/precipitation<br/>"
         f"<a href='/api/v1.0/precipitation'>/api/v1.0/precipitation</a><br/>"
+        #Stations
         #f"/api/v1.0/stations<br/>"
         f"<a href='/api/v1.0/stations'>/api/v1.0/stations</a><br/>"
+        #Temperatures
         #f"/api/v1.0/tobs<br/>"
         f"<a href='/api/v1.0/tobs'>/api/v1.0/tobs</a><br/>"
+        #Min, max, avg temps for a start date
         f"/api/v1.0/start_date (e.g., /api/v1.0/2017-01-01)<br/>"
-        #f"<a href='/api/v1.0/start_date (e.g., /api/v1.0/2017-01-01)'>/api/v1.0/start_date (e.g., /api/v1.0/2017-01-01)</a><br/>"
-        f"/api/v1.0/start_date/end_date (e.g., /api/v1.0/2017-01-01/2017-12-31)<br/>"
-        #f"<a href='/api/v1.0/start_date/end_date (e.g., /api/v1.0/2017-01-01/2017-12-31)'>/api/v1.0/start_date/end_date (e.g., /api/v1.0/2017-01-01/2017-12-31)<a><br/>"
+        #Min, max, avg temps for the range of dates
+        f"/api/v1.0/start_date/end_date (e.g., /api/v1.0/2017-01-01/2017-12-31)<br/>"  
     )
 
 
 
-#Convert the query results from your precipitation analysis (i.e. retrieve only the last 12 months of data)
+#Convert the query results from precipitation analysis (i.e. retrieve only the last 12 months of data)
 #to a dictionary using date as the key and prcp as the value.
 #Return the JSON representation of your dictionary.
 @app.route("/api/v1.0/precipitation")
@@ -94,36 +95,19 @@ def tobs_route():
 
 #Return a JSON list of the minimum temperature, the average temperature, and the maximum temperature for a specified start or start-end range.
 #For a specified start, calculate TMIN, TAVG, and TMAX for all the dates greater than or equal to the start date.
-
-#@app.route("/api/v1.0/<start>")
-
-#def start_date_temp_route(start):
-#Functions for min, max, avg temperatures
-#sel = [func.min(Measurement.tobs), func.avg(Measurement.tobs),func.max(Measurement.tobs)]
-#Query the results filtering by the start date
-#results = session.query(*sel).filter(Measurement.date >=start).all()
-#Convert results to a list and return as JSON
-#temp_data = list(np.ravel(results))
-#return jsonify(temp_data)
-
 @app.route("/api/v1.0/<start>")
 def start_date_temp_route(start):
-    # Convert the string into a date object
+     # Convert the string into a date object
     start_date = dt.datetime.strptime(start, "%Y-%m-%d").date()
-
-    print(f"{start=} {start_date=}", flush=True)
-
-    # Functions for min, max, avg temperatures
-    sel = [func.min(Measurement.tobs), func.avg(Measurement.tobs), func.max(Measurement.tobs)]
-
-    # Query the results filtering by the start date
-    results = session.query(*sel).filter(Measurement.date >= start_date).all()
-
-    print(f"{results=}", flush=True)
-
-    # Convert results to a list and return as JSON
+    #Functions for min, max, avg temperatures
+    sel = [func.min(Measurement.tobs), func.avg(Measurement.tobs),func.max(Measurement.tobs)]
+    #Query the results filtering by the start date
+    results = session.query(*sel).filter(Measurement.date >=start_date).all()
+    #Convert results to a list and return as JSON
     temp_data = list(np.ravel(results))
     return jsonify(temp_data)
+    #print(f"{start=} {start_date=}", flush=True) #used this only for debugging
+
 
 #For a specified start date and end date, calculate TMIN, TAVG, and TMAX for the dates from the start date to the end date, inclusive.
 @app.route("/api/v1.0/<start>/<end>")
@@ -133,7 +117,7 @@ def temp_stats_route(start, end):
     # Convert the string into a date object
     end_date = dt.datetime.strptime(end, "%Y-%m-%d").date()
     sel = [func.min(Measurement.tobs), func.avg(Measurement.tobs), func.max(Measurement.tobs)]
-    results = session.query(*sel).filter(Measurement.date >= start).filter(Measurement.date <= end).all()
+    results = session.query(*sel).filter(Measurement.date >= start_date).filter(Measurement.date <= end_date).all()
     
     # Convert the result into a list
     temp_data = list(np.ravel(results))
