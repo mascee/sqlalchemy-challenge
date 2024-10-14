@@ -40,10 +40,14 @@ def home():
         f"Available Routes:<br/>"
         #f"/api/v1.0/precipitation<br/>"
         f"<a href='/api/v1.0/precipitation'>/api/v1.0/precipitation</a><br/>"
-        f"/api/v1.0/stations<br/>"
-        f"/api/v1.0/tobs<br/>"
+        #f"/api/v1.0/stations<br/>"
+        f"<a href='/api/v1.0/stations'>/api/v1.0/stations</a><br/>"
+        #f"/api/v1.0/tobs<br/>"
+        f"<a href='/api/v1.0/tobs'>/api/v1.0/tobs</a><br/>"
         f"/api/v1.0/start_date (e.g., /api/v1.0/2017-01-01)<br/>"
+        #f"<a href='/api/v1.0/start_date (e.g., /api/v1.0/2017-01-01)'>/api/v1.0/start_date (e.g., /api/v1.0/2017-01-01)</a><br/>"
         f"/api/v1.0/start_date/end_date (e.g., /api/v1.0/2017-01-01/2017-12-31)<br/>"
+        #f"<a href='/api/v1.0/start_date/end_date (e.g., /api/v1.0/2017-01-01/2017-12-31)'>/api/v1.0/start_date/end_date (e.g., /api/v1.0/2017-01-01/2017-12-31)<a><br/>"
     )
 
 
